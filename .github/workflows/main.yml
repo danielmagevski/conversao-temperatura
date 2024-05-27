@@ -39,6 +39,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USR }}
           password: ${{ secrets.DOCKERHUB_PWD }}
+          registry: docker.io
 
       - name: Docker build and push
         id: docker_build
@@ -50,7 +51,8 @@ jobs:
           tags: |
             danielmagevski/conversao-temperatura:v${{ github.run_number }}
             danielmagevski/conversao-temperatura:latest
-          outputs: type=registry
+          outputs: 
+            digest: ${{ steps.docker_build.outputs.digest }}
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.16.1
@@ -68,7 +70,7 @@ jobs:
 
       - name: Sign the container image
         run: |
-          cosign sign --key env://COSIGN_PRIVATE_KEY --yes danielmagevski/conversao-temperatura:v${{ github.run_number }}
+          cosign sign --key env://COSIGN_PRIVATE_KEY --yes ${{ steps.docker_build.outputs.digest }}
         shell: bash
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
