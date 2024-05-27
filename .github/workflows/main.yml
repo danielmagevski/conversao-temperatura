@@ -68,7 +68,10 @@ jobs:
 
       - name: Sign the container image
         run: |
-          cosign sign --key env://COSIGN_PRIVATE_KEY --yes ${{ steps.docker_build.outputs.digest }}
+          cosign sign --key env://COSIGN_PRIVATE_KEY --yes danielmagevski/conversao-temperatura:v${{ github.run_number }}
         shell: bash
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
+
+      
