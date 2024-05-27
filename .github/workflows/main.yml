@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 18.x
 
-      - name: Instalação de dependencias
+      - name: Instalação de dependências
         run: npm install
         working-directory: ./src
 
@@ -31,13 +31,16 @@ jobs:
         run: npm test
         working-directory: ./src
         
+      - name: Set up cosign
+        uses: sigstore/cosign-installer@main
+
       - name: Docker Login
         uses: docker/login-action@v3.1.0
         with:
           username: ${{ secrets.DOCKERHUB_USR }}
           password: ${{ secrets.DOCKERHUB_PWD }}
-        
-      - name: Docker build 
+
+      - name: Docker build and push
         uses: docker/build-push-action@v5.3.0
         with: 
           context: ./src
@@ -61,4 +64,9 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-    
+      - name: Sign the container image
+        run: |
+          echo ${{ secrets.COSIGN_PASSWORD }} | cosign sign --key env://COSIGN_KEY --password-file=/dev/stdin danielmagevski/conversao-temperatura:v${{ github.run_number }}
+        shell: bash
+        env:
+          COSIGN_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
