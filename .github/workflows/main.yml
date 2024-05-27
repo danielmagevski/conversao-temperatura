@@ -66,7 +66,8 @@ jobs:
 
       - name: Sign the container image
         run: |
-          echo ${{ secrets.COSIGN_PASSWORD }} | cosign sign --key env://COSIGN_PRIVATE_KEY --password-file=/dev/stdin danielmagevski/conversao-temperatura:v${{ github.run_number }}
+          cosign sign --key env://COSIGN_KEY danielmagevski/conversao-temperatura:v${{ github.run_number }}
         shell: bash
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
