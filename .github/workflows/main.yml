@@ -51,13 +51,12 @@ jobs:
           tags: |
             danielmagevski/conversao-temperatura:v${{ github.run_number }}
             danielmagevski/conversao-temperatura:latest
-          outputs: 
-            digest: ${{ steps.docker_build.outputs.digest }}
+          outputs: type=registry
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.16.1
         with:
-          image-ref: ${{ steps.docker_build.outputs.digest }}
+          image-ref: danielmagevski/conversao-temperatura:v${{ github.run_number }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: 0
@@ -70,7 +69,7 @@ jobs:
 
       - name: Sign the container image
         run: |
-          cosign sign --key env://COSIGN_PRIVATE_KEY --yes ${{ steps.docker_build.outputs.digest }}
+          cosign sign --key env://COSIGN_PRIVATE_KEY --yes danielmagevski/conversao-temperatura:v${{ github.run_number }}
         shell: bash
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
